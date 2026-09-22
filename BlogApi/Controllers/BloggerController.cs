@@ -134,8 +134,70 @@ namespace BlogApi.Controllers
 
         public object AddNewBlogger(AddNewBloggerDto addNewBloggerDto)
         {
+            var connector = new MySqlConnection(ConnectionString);
 
-            return new { message = "Sikeres felvétel.", result = "" };
+            connector.Open();
+
+            string sql = @"INSERT INTO `blogger`(`name`, `email`, `age`, `password`, `registrationTime`) VALUES (@name,@email,@age,@password,@registrationTime)";
+
+            var cmd = new MySqlCommand(sql, connector);
+
+            cmd.Parameters.AddWithValue("@name", addNewBloggerDto.Name);
+            cmd.Parameters.AddWithValue("@email", addNewBloggerDto.Email);
+            cmd.Parameters.AddWithValue("@age", addNewBloggerDto.Age);
+            cmd.Parameters.AddWithValue("@password", addNewBloggerDto.Password);
+            cmd.Parameters.AddWithValue("@registrationTime", DateTime.Now);
+
+            cmd.ExecuteNonQuery();
+
+            connector.Close();
+
+            return new { message = "Sikeres felvétel.", result = addNewBloggerDto };
         }
-    }
+
+        [HttpDelete]
+
+        public object DeleteBlogger([FromBody] int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+
+            connector.Open();
+
+            string sql = @"DELETE FROM `blogger` WHERE id = @id";
+
+            var cmd = new MySqlCommand(sql, connector);
+
+            cmd.Parameters.AddWithValue("@id", id);
+
+            cmd.ExecuteNonQuery();
+
+            connector.Close();
+
+            return new { message = "Sikeres törlés.", result = "" };
+        }
+
+        [HttpPut]
+
+        public object UpdateBloggerDto(int id, UpdateBloggerDto updateBloggerDto)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+
+            connector.Open();
+
+            string sql = @"UPDATE `blogger` SET `name`=@name, `email`=@email, `age`=@age, `password`=@password WHERE `id` = @id;";
+
+            var cmd = new MySqlCommand(sql, connector);
+
+            cmd.Parameters.AddWithValue("@name", updateBloggerDto.Name);
+            cmd.Parameters.AddWithValue("@email", updateBloggerDto.Email);
+            cmd.Parameters.AddWithValue("@age", updateBloggerDto.Age);
+            cmd.Parameters.AddWithValue("@password", updateBloggerDto.Password);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            cmd.ExecuteNonQuery();
+
+            connector.Close();
+            return new { message = "Sikeres frissítés.", result = updateBloggerDto };
+        }
+    };
 }
