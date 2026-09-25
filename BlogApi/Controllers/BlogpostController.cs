@@ -136,5 +136,23 @@ namespace BlogApi.Controllers
 
             return new { message = "Sikeres törlés.", result = "" };
         }
+
+        [HttpGet("count")]
+        public object GetBlogpostCount()
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+
+            
+            string sql = "SELECT COUNT(*) FROM blogpost;";
+            var cmd = new MySqlCommand(sql, connector);
+
+            
+            var count = Convert.ToInt32(cmd.ExecuteScalar());
+
+            connector.Close();
+
+            return new { message = "Sikeres lekérdezés", result = count };
+        }
     }
 }
