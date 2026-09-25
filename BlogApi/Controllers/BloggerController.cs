@@ -199,5 +199,40 @@ namespace BlogApi.Controllers
             connector.Close();
             return new { message = "Sikeres frissítés.", result = updateBloggerDto };
         }
+
+        [HttpGet("nameAndEmailById")]
+        public object GetBloggerNameAndEmail(int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+
+            
+            string sql = "SELECT name, email FROM blogger WHERE id = @id;";
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            var datareader = cmd.ExecuteReader();
+            object result = null;
+
+            if (datareader.Read())
+            {
+                result = new
+                {
+                    message = "Sikeres lekérdezés",
+                    result = new
+                    {
+                        Name = datareader.GetString("name"),
+                        Email = datareader.GetString("email")
+                    }
+                };
+            }
+            else
+            {
+                result = new { message = "Nincs ilyen Id.", result = "" };
+            }
+
+            connector.Close();
+            return result;
+        }
     };
 }
