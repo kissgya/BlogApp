@@ -234,5 +234,40 @@ namespace BlogApi.Controllers
             connector.Close();
             return result;
         }
+
+        [HttpGet("postsWithBloggerName")]
+        public object GetPostsWithBloggerName(int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+
+            
+            string sql = @"
+                SELECT blogger.name, blogpost.Title, blogpost.Content 
+                FROM blogger 
+                INNER JOIN blogpost ON blogger.id = blogpost.blogId 
+                WHERE blogger.id = @id;";
+
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            var datareader = cmd.ExecuteReader();
+            var results = new List<object>();
+
+            while (datareader.Read())
+            {
+             
+                results.Add(new
+                {
+                    Name = datareader.GetString("name"),
+                    Title = datareader.GetString("Title"),
+                    Content = datareader.GetString("Content")
+                });
+            }
+
+            connector.Close();
+
+            return new { message = "Sikeres lekérdezés", result = results };
+        }
     };
 }
