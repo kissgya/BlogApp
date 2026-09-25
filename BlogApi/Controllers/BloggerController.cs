@@ -269,5 +269,24 @@ namespace BlogApi.Controllers
 
             return new { message = "Sikeres lekérdezés", result = results };
         }
+
+        [HttpGet("postCountById")]
+        public object GetPostCountByBloggerId(int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+
+            
+            string sql = "SELECT COUNT(*) FROM blogpost WHERE blogId = @id;";
+            var cmd = new MySqlCommand(sql, connector);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            
+            var count = Convert.ToInt32(cmd.ExecuteScalar());
+
+            connector.Close();
+
+            return new { message = "Sikeres lekérdezés", result = count };
+        }
     };
 }
